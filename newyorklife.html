@@ -1,0 +1,408 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta name="theme-color" content="#f2eee5">
+	<title>First Paycheck | A Life Sim</title>
+	<style>
+		:root {
+			color-scheme: light;
+			--paper: #f2eee5;
+			--ink: #1d2925;
+			--muted: #64716b;
+			--green: #245849;
+			--green-dark: #193d34;
+			--lime: #d7ec8a;
+			--coral: #e8795d;
+			--line: #ded8cb;
+			--white: #fffdf8;
+			--shadow: 0 16px 42px rgba(45, 54, 43, .08);
+		}
+		* { box-sizing: border-box; }
+		body {
+			margin: 0;
+			min-width: 320px;
+			background-color: var(--paper);
+			background-image: radial-gradient(rgba(59, 76, 57, .08) .65px, transparent .65px);
+			background-size: 7px 7px;
+			color: var(--ink);
+			font-family: "Trebuchet MS", "Segoe UI", sans-serif;
+		}
+		button, input { font: inherit; }
+		button { cursor: pointer; }
+		.shell { max-width: 1240px; margin: auto; padding: 24px 32px 48px; }
+		.topbar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 22px; }
+		.brand { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 900; letter-spacing: .04em; }
+		.brand-mark { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 10px; background: var(--green); color: var(--lime); font-size: 18px; }
+		.top-note { color: var(--muted); font-size: 12px; font-weight: 700; }
+		.hero {
+			position: relative; overflow: hidden; min-height: 250px; padding: 34px 38px;
+			display: flex; align-items: center; border-radius: 13px;
+			color: #fffdf8; background: linear-gradient(105deg, rgba(24, 57, 48, .98) 0%, rgba(32, 75, 61, .94) 47%, rgba(32, 75, 61, .18) 100%),
+			linear-gradient(180deg, #a5b88a, #e1b273 68%, #b77554);
+			box-shadow: var(--shadow);
+		}
+		.hero-copy { position: relative; z-index: 2; max-width: 570px; }
+		.eyebrow { color: var(--lime); font-size: 11px; font-weight: 900; letter-spacing: .13em; text-transform: uppercase; }
+		h1 { margin: 10px 0 8px; font-family: Georgia, "Times New Roman", serif; font-size: clamp(36px, 5vw, 57px); font-weight: 500; line-height: .98; }
+		.hero p { max-width: 430px; margin: 14px 0 0; color: rgba(255,255,255,.82); font-size: 14px; line-height: 1.65; }
+		.skyline { position: absolute; right: 3%; bottom: 0; width: 49%; height: 90%; opacity: .8; }
+		.sun { position: absolute; right: 24%; top: 16%; width: 88px; aspect-ratio: 1; border-radius: 50%; background: #e9c678; box-shadow: 0 0 50px rgba(241, 210, 144, .36); }
+		.building { position: absolute; bottom: 0; background: #263f36; border-radius: 4px 4px 0 0; box-shadow: inset 6px 0 rgba(255,255,255,.05); }
+		.building::after { content: ""; position: absolute; inset: 14px 9px 0; background: repeating-linear-gradient(90deg, transparent 0 14px, rgba(220,227,170,.62) 14px 19px, transparent 19px 31px), repeating-linear-gradient(0deg, transparent 0 24px, rgba(220,227,170,.48) 24px 29px, transparent 29px 39px); }
+		.b1 { right: 4%; width: 23%; height: 59%; }.b2 { right: 30%; width: 28%; height: 76%; background:#314a3c; }.b3 { right: 59%; width: 26%; height: 47%; background:#294237; }
+		.campus-tree { position: absolute; bottom: 0; left: 4%; width: 17%; height: 56%; border-radius: 50% 50% 0 0; background: #355844; }
+		.campus-tree::after { content:""; position:absolute; left: 38%; bottom:0; width:25%; height:34%; background:#79563b; }
+		.setup {
+			margin: 20px 0 18px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 10px; background: rgba(255,253,248,.92); box-shadow: var(--shadow);
+		}
+		.setup-label { margin-bottom: 9px; color: var(--muted); font-size: 10px; font-weight: 900; letter-spacing: .1em; text-transform: uppercase; }
+		.setup-heading { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-bottom:18px; }
+		.setup-heading h2 { margin:0; font-family:Georgia, "Times New Roman", serif; font-size:25px; font-weight:500; }
+		.step-count { color:var(--muted); font-size:11px; font-weight:800; }
+		.form-grid { display:grid; grid-template-columns:repeat(2, minmax(0,1fr)); gap:14px; max-width:650px; }
+		.form-field { display:grid; gap:6px; }
+		.form-field label { color:#52605a; font-size:11px; font-weight:800; }
+		.form-field input, .form-field select { width:100%; min-height:42px; padding:10px 11px; border:1px solid var(--line); border-radius:7px; outline:none; background:var(--white); color:var(--ink); }
+		.form-field input:focus, .form-field select:focus { border-color:var(--green); box-shadow:0 0 0 3px rgba(36,88,73,.12); }
+		.form-help { margin:12px 0 0; color:var(--muted); font-size:11px; }
+		.setup-footer { display:flex; justify-content:space-between; align-items:center; gap:12px; margin-top:18px; }
+		.back-button { padding:10px 13px; border:1px solid var(--line); border-radius:7px; background:transparent; color:var(--ink); font-size:12px; font-weight:800; }
+		.city-field { max-width:420px; }
+		.country-row { display:flex; flex-wrap:wrap; gap:9px; margin-bottom:15px; }
+		.choice { padding: 9px 13px; border: 1px solid var(--line); border-radius: 7px; color: var(--ink); background: transparent; font-size: 12px; font-weight: 800; }
+		.choice.active { border-color: var(--green); background: var(--green); color: white; }
+		.new-game { padding: 11px 16px; border: 0; border-radius: 7px; background: var(--coral); color: white; font-size: 12px; font-weight: 900; transition: transform .16s, background .16s; }
+		.new-game:hover { transform: translateY(-2px); background: #d9684c; }
+		.dashboard { display: grid; grid-template-columns: minmax(0, 1.65fr) minmax(260px, .75fr); gap: 18px; align-items: start; }
+		.main-column, .side-column { display: grid; gap: 16px; }
+		.panel { border: 1px solid var(--line); border-radius: 10px; background: var(--white); box-shadow: 0 5px 16px rgba(45,54,43,.035); }
+		.status-panel { padding: 20px 21px 17px; }
+		.section-heading { display: flex; justify-content: space-between; align-items: center; gap: 12px; }
+		h2 { margin: 0; font-family: Georgia, "Times New Roman", serif; font-size: 22px; font-weight: 500; }
+		.phase-pill { padding: 6px 9px; border-radius: 5px; background: #edf2e4; color: var(--green); font-size: 10px; font-weight: 900; letter-spacing: .04em; text-transform: uppercase; }
+		.date-line { margin-top: 5px; color: var(--muted); font-size: 12px; }
+		.stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; margin-top: 19px; }
+		.stat { min-width: 0; padding: 12px; border-radius: 7px; background: #f5f3ed; }
+		.stat-label { color: var(--muted); font-size: 10px; font-weight: 800; text-transform: uppercase; }
+		.stat-value { display: block; overflow: hidden; margin-top: 7px; font-family: Georgia, "Times New Roman", serif; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+		.meter { height: 4px; margin-top: 8px; overflow: hidden; border-radius: 4px; background: #dfddd4; }
+		.meter span { display:block; height:100%; border-radius:inherit; background: var(--green); transition: width .3s ease; }
+		.story { padding: 19px 21px; border-left: 4px solid var(--coral); }
+		.story-tag { color: #b65b42; font-size: 10px; font-weight: 900; letter-spacing: .11em; text-transform: uppercase; }
+		.story h2 { margin-top: 7px; font-size: 23px; }
+		.story p { margin: 8px 0 0; color: #52605a; font-size: 13px; line-height: 1.65; }
+		.actions-panel { padding: 19px 21px 20px; }
+		.actions-panel h2 { font-size: 21px; }
+		.subcopy { margin: 5px 0 14px; color: var(--muted); font-size: 12px; }
+		.actions { display: grid; grid-template-columns: repeat(2, 1fr); gap: 9px; }
+		.action {
+			display: grid; grid-template-columns: 35px minmax(0, 1fr) 16px; align-items: center; gap: 10px; min-height: 64px;
+			padding: 10px; text-align: left; border: 1px solid var(--line); border-radius: 7px; background: #fffefa; color: var(--ink); transition: border-color .15s, transform .15s, background .15s;
+		}
+		.action:hover:not(:disabled) { transform: translateY(-2px); border-color: #9aa992; background: #f7f8ef; }
+		.action:disabled { cursor: not-allowed; opacity: .45; }
+		.action-icon { display: grid; width: 35px; height: 35px; place-items: center; border-radius: 7px; background: #eaf0dc; color: var(--green); font-size: 15px; font-weight: 900; }
+		.action strong { display: block; font-size: 11px; }
+		.action small { display: block; margin-top: 3px; color: var(--muted); font-size: 10px; line-height: 1.35; }
+		.action-arrow { color: #87918a; font-size: 18px; }
+		.side-panel { padding: 18px; }
+		.side-panel h2 { font-size: 19px; }
+		.loan-card { display: flex; justify-content: space-between; gap: 12px; margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+		.loan-card:first-of-type { margin-top: 14px; }
+		.loan-card span { color: var(--muted); font-size: 11px; }
+		.loan-card strong { display:block; margin-top: 4px; font-size: 13px; }
+		.loan-card b { color: var(--green); font-size: 12px; white-space: nowrap; }
+		.career-track { margin-top: 16px; }
+		.career-top { display:flex; justify-content:space-between; gap:8px; font-size: 11px; font-weight: 800; }
+		.career-top span:last-child { color: var(--muted); }
+		.career-track .meter { height: 7px; margin-top: 8px; }
+		.career-track .meter span { background: var(--coral); }
+		.ledger { max-height: 205px; overflow: auto; margin: 12px -4px 0 0; padding-right: 4px; }
+		.ledger-row { display:flex; justify-content:space-between; gap: 10px; padding: 9px 0; border-top: 1px solid #eeeae1; font-size: 11px; }
+		.ledger-row span { color: var(--muted); }
+		.ledger-row strong { text-align:right; }
+		.positive { color: var(--green); }.negative { color: #bd5743; }
+		.fine-print { margin: 14px 0 0; color: #778079; font-size: 10px; line-height: 1.5; }
+		.overlay { position: fixed; z-index: 5; inset: 0; display: grid; place-items: center; padding: 20px; background: rgba(20,35,29,.6); backdrop-filter: blur(4px); }
+		.modal { width: min(460px, 100%); padding: 29px; border-radius: 11px; background: var(--white); box-shadow: 0 25px 80px rgba(0,0,0,.24); animation: rise .35s ease both; }
+		@keyframes rise { from { opacity:0; transform:translateY(12px) } to { opacity:1; transform:translateY(0) } }
+		.modal .eyebrow { color: #b65b42; }
+		.modal h2 { margin-top: 10px; font-size: 31px; }
+		.modal p { color: #5e6a64; font-size: 13px; line-height: 1.7; }
+		.modal .new-game { margin-top: 9px; }
+		.hidden { display:none !important; }
+		@media (max-width: 800px) {
+			.shell { padding: 18px 17px 32px; }
+			.hero { min-height: 230px; padding: 28px 25px; }
+			.skyline { right: -17%; width: 65%; opacity: .55; }
+			.dashboard { grid-template-columns: 1fr; }
+			.side-column { grid-template-columns: repeat(2, minmax(0,1fr)); }
+		}
+		@media (max-width: 560px) {
+			.shell { padding: 14px 12px 26px; }
+			.topbar { margin-bottom: 13px; }
+			.top-note { max-width: 120px; text-align: right; line-height: 1.4; }
+			.hero { min-height: 218px; padding: 24px 20px; }
+			.hero p { max-width: 295px; font-size: 12px; }
+			.skyline { right: -39%; width: 85%; opacity: .38; }
+			.setup { padding: 16px; }
+			.new-game { width: 100%; }
+			.form-grid { grid-template-columns:1fr; }
+			.setup-footer { align-items:stretch; flex-direction:column-reverse; }
+			.back-button { width:100%; }
+			.status-panel, .story, .actions-panel { padding: 16px; }
+			.stats { grid-template-columns: repeat(2, 1fr); gap: 8px; margin-top: 14px; }
+			.stat { padding: 10px; }
+			.stat-value { font-size: 18px; }
+			.actions { grid-template-columns: 1fr; }
+			.action { min-height: 58px; }
+			.side-column { grid-template-columns: 1fr; }
+		}
+		@media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+	</style>
+</head>
+<body>
+	<main class="shell">
+		<header class="topbar">
+			<div class="brand"><span class="brand-mark">FP</span> FIRST PAYCHECK</div>
+			<div class="top-note">A life sim about the long game</div>
+		</header>
+		<section class="hero" aria-labelledby="page-title">
+			<div class="hero-copy">
+				<div class="eyebrow">Your life, one month at a time</div>
+				<h1 id="page-title">The first step<br>is yours.</h1>
+				<p>Start on campus. Find your footing. Pay down the debt and make a career that feels like your own.</p>
+			</div>
+			<div class="skyline" aria-hidden="true"><div class="sun"></div><div class="campus-tree"></div><div class="building b1"></div><div class="building b2"></div><div class="building b3"></div></div>
+		</section>
+
+		<section class="setup" id="onboarding" aria-label="Create your player profile">
+			<div id="profile-step">
+				<div class="setup-heading"><div><div class="setup-label">Step 1 · Your biodata</div><h2>Tell us about your character</h2></div><span class="step-count">01 / 02</span></div>
+				<div class="form-grid">
+					<div class="form-field"><label for="player-name">Name</label><input id="player-name" type="text" maxlength="24" autocomplete="given-name" placeholder="Your name" required></div>
+					<div class="form-field"><label for="player-age">Age</label><input id="player-age" type="number" min="16" max="35" value="18" required></div>
+					<div class="form-field"><label for="player-subject">What are you studying?</label><select id="player-subject" required><option value="" disabled selected>Choose a subject</option><option>Business</option><option>Computer science</option><option>Education</option><option>Engineering</option><option>Health sciences</option><option>Arts and humanities</option><option>Undecided</option></select></div>
+				</div>
+				<p class="form-help">These details shape your character's story. You can use a nickname.</p>
+				<div class="setup-footer"><span></span><button class="new-game" id="profile-continue" type="button">Choose your hometown <span aria-hidden="true">→</span></button></div>
+			</div>
+			<div class="hidden" id="city-step">
+				<div class="setup-heading"><div><div class="setup-label">Step 2 · Where you're from</div><h2>Pick your hometown</h2></div><span class="step-count">02 / 02</span></div>
+				<div class="setup-label">Choose your country</div>
+				<div class="country-row">
+					<button class="choice active" data-country="US" type="button">🇺🇸 United States</button>
+					<button class="choice" data-country="UK" type="button">🇬🇧 United Kingdom</button>
+				</div>
+				<div class="form-field city-field"><label for="player-city">City you're from</label><select id="player-city"></select></div>
+				<p class="form-help">Your hometown will appear in your life story. You can choose from either country's cities.</p>
+				<div class="setup-footer"><button class="back-button" id="profile-back" type="button">← Back to profile</button><button class="new-game" id="start-button" type="button">Begin your story <span aria-hidden="true">→</span></button></div>
+			</div>
+		</section>
+
+		<div class="dashboard hidden" id="game" aria-live="polite">
+			<section class="main-column">
+				<article class="panel status-panel">
+					<div class="section-heading"><h2 id="welcome">Your next chapter</h2><span class="phase-pill" id="phase">Ready to begin</span></div>
+					<div class="date-line" id="date-line">Choose a country and start your story.</div>
+					<div class="stats">
+						<div class="stat"><div class="stat-label">Cash</div><strong class="stat-value" id="cash">$0</strong><div class="meter"><span id="cash-meter" style="width:25%"></span></div></div>
+						<div class="stat"><div class="stat-label">Student debt</div><strong class="stat-value" id="debt">$0</strong><div class="meter"><span id="debt-meter" style="width:75%"></span></div></div>
+						<div class="stat"><div class="stat-label">Wellbeing</div><strong class="stat-value" id="wellbeing">--</strong><div class="meter"><span id="wellbeing-meter" style="width:70%"></span></div></div>
+						<div class="stat"><div class="stat-label">Career</div><strong class="stat-value" id="career-stat">Student</strong><div class="meter"><span id="career-meter" style="width:8%"></span></div></div>
+					</div>
+				</article>
+				<article class="panel story">
+					<div class="story-tag" id="story-tag">A fresh start</div>
+					<h2 id="story-title">The choices are small. The years add up.</h2>
+					<p id="story-text">You have a place at university, a budget that needs watching, and a whole lot of possibility ahead. Pick one thing to focus on this month.</p>
+				</article>
+				<article class="panel actions-panel">
+					<div class="section-heading"><h2>How will you spend this month?</h2><span class="phase-pill" id="turns-left">Start to play</span></div>
+					<p class="subcopy">Choose one focus. Every month brings new costs and chances.</p>
+					<div class="actions">
+						<button class="action" data-action="study" type="button" disabled><span class="action-icon">A+</span><span><strong>Hit the books</strong><small>Build grades and future earning power</small></span><span class="action-arrow">›</span></button>
+						<button class="action" data-action="work" type="button" disabled><span class="action-icon">$</span><span><strong>Pick up a shift</strong><small>Earn cash now, spend less time studying</small></span><span class="action-arrow">›</span></button>
+						<button class="action" data-action="network" type="button" disabled><span class="action-icon">↗</span><span><strong>Meet someone new</strong><small>Grow your network and open doors</small></span><span class="action-arrow">›</span></button>
+						<button class="action" data-action="rest" type="button" disabled><span class="action-icon">☼</span><span><strong>Take a breather</strong><small>Look after yourself and reset</small></span><span class="action-arrow">›</span></button>
+						<button class="action hidden" data-action="career" type="button" disabled><span class="action-icon">✦</span><span><strong>Invest in your career</strong><small>Learn a new skill on the job</small></span><span class="action-arrow">›</span></button>
+						<button class="action hidden" data-action="repay" type="button" disabled><span class="action-icon">−</span><span><strong>Make an extra payment</strong><small>Put spare cash toward your loans</small></span><span class="action-arrow">›</span></button>
+					</div>
+				</article>
+			</section>
+			<aside class="side-column">
+				<article class="panel side-panel">
+					<h2>Your money</h2>
+					<div class="loan-card"><div><span>Living costs</span><strong id="living-cost">$0 / month</strong></div><b id="cost-note">Budget</b></div>
+					<div class="loan-card"><div><span>Loan plan</span><strong id="loan-name">Not selected</strong></div><b id="loan-status">—</b></div>
+					<div class="loan-card"><div><span>Last month's cashflow</span><strong id="cashflow">$0</strong></div><b id="cashflow-note">No turns yet</b></div>
+					<p class="fine-print">All money, costs, and loan terms are fictional game values, not financial advice or a guide to real loan rules.</p>
+				</article>
+				<article class="panel side-panel">
+					<h2>Career path</h2>
+					<div class="career-track"><div class="career-top"><span id="job-title">University student</span><span id="career-level">Level 0</span></div><div class="meter"><span id="path-meter" style="width:5%"></span></div></div>
+					<div class="loan-card"><div><span>Skills</span><strong id="skills">0 points</strong></div><b id="skills-note">Starting out</b></div>
+					<div class="loan-card"><div><span>Connections</span><strong id="connections">0 people</strong></div><b id="connections-note">New city</b></div>
+				</article>
+				<article class="panel side-panel">
+					<div class="section-heading"><h2>Recent months</h2><span class="phase-pill">Journal</span></div>
+					<div class="ledger" id="ledger"><div class="ledger-row"><span>Your story will show up here.</span><strong>—</strong></div></div>
+				</article>
+			</aside>
+		</div>
+	</main>
+	<div class="overlay hidden" id="ending" role="dialog" aria-modal="true" aria-labelledby="ending-title">
+		<div class="modal"><div class="eyebrow">A new chapter</div><h2 id="ending-title">Look how far you came.</h2><p id="ending-copy"></p><button class="new-game" id="play-again" type="button">Start a new story <span aria-hidden="true">→</span></button></div>
+	</div>
+	<script>
+		const config = {
+			US: { currency: 'USD', symbol: '$', startCash: 3200, debt: 42000, living: 1050, monthlyGrant: 650, loanName: 'Campus loan', term: 'Interest builds while you study; choose extra payments after graduation.' },
+			UK: { currency: 'GBP', symbol: '£', startCash: 2100, debt: 28500, living: 780, monthlyGrant: 420, loanName: 'Student loan plan', term: 'Repayments scale with your income after graduation in this game.' }
+		};
+		const cities = {
+			US: ['Atlanta, Georgia', 'Austin, Texas', 'Boston, Massachusetts', 'Chicago, Illinois', 'Los Angeles, California', 'Miami, Florida', 'New York, New York', 'Seattle, Washington'],
+			UK: ['Birmingham', 'Bristol', 'Cardiff', 'Edinburgh', 'Glasgow', 'Leeds', 'London', 'Manchester']
+		};
+		const state = { country: 'US', name: 'Alex', age: 18, subject: 'Undecided', city: 'Boston, Massachusetts', month: 0, year: 1, cash: 0, debt: 0, wellbeing: 72, skills: 0, connections: 0, grades: 0, career: 0, employed: false, graduate: false, started: false, done: false, lastFlow: 0, journal: [] };
+		const $ = (id) => document.getElementById(id);
+		const currency = (amount) => {
+			const { currency: code } = config[state.country];
+			return new Intl.NumberFormat(state.country === 'US' ? 'en-US' : 'en-GB', { style: 'currency', currency: code, maximumFractionDigits: 0 }).format(Math.round(amount));
+		};
+		function chooseCountry(country) {
+			state.country = country;
+			document.querySelectorAll('[data-country]').forEach((button) => button.classList.toggle('active', button.dataset.country === country));
+			$('player-city').innerHTML = cities[country].map((city) => `<option>${city}</option>`).join('');
+		}
+		function startGame() {
+			state.name = $('player-name').value.trim();
+			state.age = Number($('player-age').value);
+			state.subject = $('player-subject').value;
+			state.city = $('player-city').value;
+			state.month = 0; state.year = 1; state.cash = config[state.country].startCash;
+			state.debt = config[state.country].debt; state.wellbeing = 72; state.skills = 0;
+			state.connections = 0; state.grades = 0; state.career = 0; state.employed = false;
+			state.graduate = false; state.started = true; state.done = false; state.lastFlow = 0; state.journal = [];
+			$('onboarding').classList.add('hidden');
+			$('game').classList.remove('hidden');
+			$('ending').classList.add('hidden');
+			document.querySelectorAll('.action').forEach((button) => button.disabled = false);
+			render();
+			$('story-tag').textContent = 'Move-in day';
+			$('story-title').textContent = `Welcome to campus, ${state.name}.`;
+			$('story-text').textContent = `At ${state.age}, ${state.name} leaves ${state.city} for campus to study ${state.subject.toLowerCase()}. The room is tiny, the reading list is not, and the first term starts now. Tuition is covered by a fictional ${config[state.country].loanName.toLowerCase()}; the rest is up to you.`;
+		}
+		function continueToCity() {
+			if (!$('player-name').reportValidity() || !$('player-age').reportValidity() || !$('player-subject').reportValidity()) return;
+			state.name = $('player-name').value.trim();
+			$('profile-step').classList.add('hidden');
+			$('city-step').classList.remove('hidden');
+		}
+		function act(action) {
+			if (state.done) return;
+			const wasGraduate = state.graduate;
+			const costs = config[state.country].living;
+			let note = '';
+			let income = state.graduate ? 0 : config[state.country].monthlyGrant;
+			if (state.graduate && state.employed) income += 1800 + state.career * 260 + state.skills * 18;
+			if (!state.graduate && state.country === 'US') state.debt *= 1.004;
+			if (action === 'study') { state.grades += 2; state.skills += 1; state.wellbeing -= 7; note = 'Late-night study sessions sharpen your skills and grades.'; }
+			if (action === 'work') { income += state.graduate ? 420 : 620; state.wellbeing -= 5; state.skills += state.graduate ? 1 : 0; note = state.graduate ? 'You take an extra shift and bring home more this month.' : 'A busy month at work leaves less time for coursework.'; }
+			if (action === 'network') { state.connections += 2; state.wellbeing -= 3; if (state.graduate) state.career = Math.min(10, state.career + 1); note = state.graduate ? 'A conversation leads to a promising new contact.' : 'You find your people at a campus event.'; }
+			if (action === 'rest') { state.wellbeing = Math.min(100, state.wellbeing + 17); note = 'A quiet weekend, a long walk, and a little room to breathe.'; }
+			if (action === 'career') { state.skills += 2; state.career = Math.min(10, state.career + 1); state.wellbeing -= 4; note = 'You take a course and put a new skill to work.'; }
+			if (action === 'repay') {
+				const payment = Math.min(Math.max(0, state.cash - 250), 900);
+				if (payment > 0) { state.cash -= payment; state.debt = Math.max(0, state.debt - payment); }
+				note = payment > 0 ? `You put ${currency(payment)} toward your loan.` : 'You keep your cash cushion intact this month.';
+			}
+			if (!state.graduate && action !== 'repay' && state.country === 'UK') state.debt *= 1.001;
+			if (state.graduate && state.country === 'UK' && income > 2100) {
+				const automatic = Math.min(state.debt, (income - 2100) * .09);
+				state.debt -= automatic;
+				note += ` A ${currency(automatic)} income-based repayment is made automatically.`;
+			}
+			if (state.graduate && state.country === 'US') state.debt *= 1.003;
+			const expense = costs + (state.wellbeing < 25 ? 100 : 0);
+			const flow = income - expense;
+			state.cash += flow;
+			if (state.cash < 0) { state.debt += Math.abs(state.cash) * .4; state.cash = 0; state.wellbeing -= 7; note += ' A tight month means you borrow a little more.'; }
+			state.wellbeing = Math.max(0, Math.min(100, state.wellbeing));
+			state.month++;
+			if (!state.graduate && state.month >= 48) {
+				state.graduate = true;
+				state.career = Math.max(1, Math.min(6, Math.floor(state.grades / 16) + Math.floor(state.connections / 16)));
+				state.employed = true;
+				state.skills += 3;
+				note += ` Graduation day! Your grades and connections help you land an entry-level role.`;
+			}
+			if (state.graduate && state.month >= 60 && state.career >= 10) state.done = true;
+			if (state.month >= 96) state.done = true;
+			state.lastFlow = flow;
+			const date = `Year ${Math.min(8, Math.floor((state.month - 1) / 12) + 1)}, Month ${((state.month - 1) % 12) + 1}`;
+			state.journal.unshift({ date, note, flow });
+			state.journal = state.journal.slice(0, 16);
+			render();
+			if (!wasGraduate && state.graduate) {
+				$('story-tag').textContent = 'Graduation day';
+				$('story-title').textContent = `${state.name}, you made it.`;
+				$('story-text').textContent = `Four years of choices brought you here. Your grades and connections helped land an entry-level job. Now your paycheck can grow, and your loan plan changes with it.`;
+			} else {
+				$('story-tag').textContent = state.graduate ? 'Life after campus' : 'This month';
+				$('story-title').textContent = action === 'work' ? 'One shift at a time.' : action === 'study' ? 'A little progress adds up.' : action === 'network' ? 'Good things start with hello.' : action === 'rest' ? 'Rest is part of the plan.' : action === 'repay' ? 'Every payment moves you forward.' : 'Your next move matters.';
+				$('story-text').textContent = note;
+			}
+			if (state.done) showEnding();
+		}
+		function render() {
+			const active = state.started && !state.done;
+			const displayMonth = Math.max(1, state.month);
+			$('welcome').textContent = state.started ? `${state.name}'s story` : 'Your next chapter';
+			$('phase').textContent = !state.started ? 'Ready to begin' : state.graduate ? 'Working life' : 'University';
+			$('date-line').textContent = !state.started ? 'Choose a country and start your story.' : `Year ${Math.min(8, Math.floor((displayMonth - 1) / 12) + 1)} · Month ${((displayMonth - 1) % 12) + 1} · From ${state.city}`;
+			$('cash').textContent = currency(state.cash); $('debt').textContent = currency(state.debt);
+			$('wellbeing').textContent = `${state.wellbeing}%`; $('career-stat').textContent = state.graduate ? `Level ${state.career}` : 'Student';
+			$('cash-meter').style.width = `${Math.min(100, 8 + state.cash / 100)}%`;
+			$('debt-meter').style.width = `${Math.min(100, state.debt / (config[state.country].debt || 1) * 70)}%`;
+			$('wellbeing-meter').style.width = `${state.wellbeing}%`;
+			$('career-meter').style.width = `${Math.min(100, state.career * 10)}%`;
+			$('living-cost').textContent = `${currency(config[state.country].living)} / month`;
+			$('loan-name').textContent = config[state.country].loanName;
+			$('loan-status').textContent = state.graduate ? (state.country === 'UK' ? 'Income-based' : 'In repayment') : 'In study';
+			$('cost-note').textContent = state.cash < config[state.country].living ? 'Tight' : 'Essential';
+			$('cashflow').textContent = state.month ? `${state.lastFlow >= 0 ? '+' : ''}${currency(state.lastFlow)}` : currency(0);
+			$('cashflow').className = state.lastFlow >= 0 ? 'positive' : 'negative';
+			$('cashflow-note').textContent = state.month ? 'After living costs' : 'No turns yet';
+			$('job-title').textContent = state.graduate ? (state.career >= 8 ? 'Team leader' : state.career >= 5 ? 'Senior specialist' : state.career >= 3 ? 'Specialist' : 'Junior associate') : 'University student';
+			$('career-level').textContent = `Level ${state.graduate ? state.career : 0}`;
+			$('path-meter').style.width = `${Math.min(100, state.career * 10)}%`;
+			$('skills').textContent = `${state.skills} points`; $('skills-note').textContent = state.skills >= 10 ? 'Growing' : 'In progress';
+			$('connections').textContent = `${state.connections} ${state.connections === 1 ? 'person' : 'people'}`;
+			$('connections-note').textContent = state.connections >= 8 ? 'A strong network' : 'Keep showing up';
+			$('turns-left').textContent = !state.started ? 'Start to play' : state.graduate ? 'Career chapter' : `${48 - state.month} months to graduation`;
+			document.querySelectorAll('.action').forEach((button) => {
+				const key = button.dataset.action;
+				button.classList.toggle('hidden', (key === 'career' || key === 'repay') && !state.graduate);
+				button.disabled = !active || (!state.graduate && (key === 'career' || key === 'repay')) || (key === 'repay' && state.cash < 350);
+			});
+			$('ledger').innerHTML = state.journal.length ? state.journal.map((entry) => `<div class="ledger-row"><span>${entry.date} · ${entry.note}</span><strong class="${entry.flow >= 0 ? 'positive' : 'negative'}">${entry.flow >= 0 ? '+' : ''}${currency(entry.flow)}</strong></div>`).join('') : '<div class="ledger-row"><span>Your story will show up here.</span><strong>—</strong></div>';
+		}
+		function showEnding() {
+			document.querySelectorAll('.action').forEach((button) => button.disabled = true);
+			$('ending-title').textContent = state.career >= 10 ? 'You built something real.' : 'Look how far you came.';
+			$('ending-copy').textContent = `${state.name} finished with ${currency(state.cash)} in cash, ${currency(state.debt)} in student debt, a ${state.wellbeing}% wellbeing score, and career level ${state.career}. There isn't one perfect route through adult life. You made yours.`;
+			$('ending').classList.remove('hidden');
+		}
+		document.querySelectorAll('[data-country]').forEach((button) => button.addEventListener('click', () => chooseCountry(button.dataset.country)));
+		document.querySelectorAll('.action').forEach((button) => button.addEventListener('click', () => act(button.dataset.action)));
+		$('profile-continue').addEventListener('click', continueToCity);
+		$('profile-back').addEventListener('click', () => { $('city-step').classList.add('hidden'); $('profile-step').classList.remove('hidden'); });
+		$('start-button').addEventListener('click', startGame);
+		$('play-again').addEventListener('click', startGame);
+		chooseCountry('US');
+		render();
+	</script>
+</body>
+</html>
